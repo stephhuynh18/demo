@@ -1,0 +1,25 @@
+{
+  "name": "codepad",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build",
+    "prebuild": "npm run clean",
+    "clean": "rm -rf ./lib"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/tmp": "^0.2.2",
+    "dag-jose": "^1.0.0",
+    "dag-jose-utils": "^1.0.0",
+    "did-jwt": "^5.11.1",
+    "get-port": "^6.0.0",
+    "ipfs-core": "^0.12.0",
+    "tmp-promise": "^3.0.3"
+  }
+}
