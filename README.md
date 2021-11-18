@@ -8,13 +8,19 @@ Two `ipfs` instances are created and connected.
 
 `ipfs1` is used to `dag.put` a `jws` which is of the `dag-jose` format. It is successfully retrieved by `ipfs1` but the script hangs when `ipfs2` tries to `dag.get` it.
 
+Using an older version of `ipfs` does not result in any issues
+
 ## How to Run
+
+To run the latest versions
 
 ```sh
 npm install
 npm run build
 node lib/stuff.js
 ```
+
+To run the older versions that work use the `old` branch and make sure to reinstall the dependencies
 
 ## Expected Behavior
 
