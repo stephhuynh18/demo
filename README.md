@@ -1,31 +1,18 @@
 # Help
 
-This repo demonstrates an issue that I have been having using `ipfs-core` with the `dag-jose` codec.
+According to the examples found in this tutorial: https://blog.ceramic.network/how-to-store-signed-and-encrypted-data-on-ipfs/ `ipfs.dag.get(cid)` should return the data stored at `cid`. `ipfs.dag.get(cid, {path: "/aPath"})` should return the value of the key `aPath` that is found in the data stored at `cid`. If the value associated with the key `aPath` is a `CID AKA childCID`, the data stored at `childCID` should be returned.
 
-Two `ipfs` instances are created and connected.
+In this repo I demonstrate that instead of returning the data store at `childCID`, the `CID` is returned. This is not consistent with what was the original behavior which was documented in the tutorial above.
 
-`ipfs1` is used to `dag.put` a regular json. It is successfully retrieved by `ipfs1` and `ipfs2`.
-
-`ipfs1` is used to `dag.put` a `jws` which is of the `dag-jose` format. It is successfully retrieved by `ipfs1` but the script hangs when `ipfs2` tries to `dag.get` it.
-
-Using an older version of `ipfs` does not result in any issues
+I believe that the problem lies with this line found here: https://github.com/ipfs/js-ipfs/blob/6178708aedf5ea86bf537862c08db49f5b8ea20b/packages/ipfs-core/src/utils.js#L248. The value is retrieved but `yield` is not called with it.
 
 ## How to Run
-
-To run the latest versions
 
 ```sh
 npm install
 npm run build
-node lib/stuff.js
+node lib/withDagJose.js
+node lib/withoutDagJose.js
 ```
 
-To run the older versions that work use the `old` branch and make sure to reinstall the dependencies
-
-## Expected Behavior
-
-The script should run to completion logging the retrieved data.
-
-## Current Behavior
-
-The script hangs when trying to `dag.get` data of the `dag-jose` format using `ipfs2`
+To see the original behaviour checkout the `old` branch and make sure to reinstall the dependencies
