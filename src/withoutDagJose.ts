@@ -1,5 +1,4 @@
 import { create as createIPFS } from 'ipfs-core';
-import * as dagJose from 'dag-jose';
 
 const stuff = async () => {
   const ipfs = await createIPFS();
