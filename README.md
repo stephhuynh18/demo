@@ -1,4 +1,4 @@
-# Help
+# Description
 
 According to the examples found in this tutorial: https://blog.ceramic.network/how-to-store-signed-and-encrypted-data-on-ipfs/ `ipfs.dag.get(cid)` should return the data stored at `cid`. `ipfs.dag.get(cid, {path: "/aPath"})` should return the value of the key `aPath` that is found in the data stored at `cid`. If the value associated with the key `aPath` is a `CID AKA childCID`, the data stored at `childCID` should be returned.
 
