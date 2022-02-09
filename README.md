@@ -1,19 +1,50 @@
 # Description
 
-`ipfs.dag.get(cid)` should return the data stored at `cid`.
+This repo: _ demonstrates three scenarios. A ipfs-http-client where the ipfs instance is:
+1. Ipfs-core + ipfs-http-server (latest)
+2. Ipfd-ctl + go-ipfs (latest)
+3. @ceramicnetwork/ipfs-daemon (v1.2.9)
 
-`ipfs.dag.get(cid, {path: "/aPath"})` should return the value of the key `aPath` that is found in the data stored at `cid`.
+When executing a dag.put and a dag.get (Node v6.13.1 + esm settings)
+1. Works
+2. Works
+3. I’m getting the error that is found in the failing cas build logs 
 
-If the value associated with the key `aPath` is a `CID AKA childCID`, the data stored at `childCID` should be returned.
+```
+err HTTPError: Failed to parse the JSON: SyntaxError: Unexpected token � in JSON at position 0
+    at Object.errorHandler [as handleError] (file:///Users/stephaniehuynh/Github/codepad/node_modules/ipfs-http-client/esm/src/lib/core.js:75:15)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Client.fetch (/Users/stephaniehuynh/Github/codepad/node_modules/ipfs-utils/src/http.js:144:9)
+    at async Object.put (file:///Users/stephaniehuynh/Github/codepad/node_modules/ipfs-http-client/esm/src/dag/put.js:27:19)
+    at async main (file:///Users/stephaniehuynh/Github/codepad/lib/with-ceramic-ipfs-daemon.js:19:17) {
+  response: Response {
+    size: 0,
+    timeout: 0,
+    [Symbol(Body internals)]: { body: [PassThrough], disturbed: true, error: null },
+    [Symbol(Response internals)]: {
+      url: 'http://127.0.0.1:59312/api/v0/dag/put?store-codec=dag-cbor&input-codec=dag-cbor&hash=sha2-256',
+      status: 400,
+      statusText: 'Bad Request',
+      headers: [Headers],
+      counter: 0
+    }
+  }
+}
+```
 
-In this repo I demonstrate that instead of returning the data store at `childCID`, the actual `CID` is returned. This is not consistent with what was the original behavior (ipfs-core v0.7).
+I do not know what version our docker images use
 
-I believe that the problem lies with this line found here: https://github.com/ipfs/js-ipfs/blob/6178708aedf5ea86bf537862c08db49f5b8ea20b/packages/ipfs-core/src/utils.js#L248. The value is retrieved but `yield` is not called with it.
+I also have attempted to upgrade @ceramicnetwork/ipfs-daemon to v2.0.0-alpha.1
+but I get this error: 
+``` Cannot find module '@ceramicnetwork/ipfs-daemon' or its corresponding type declarations. ```
 
+Looking in the corresponding node_module folder shows that its empty except bin
 ## How to Run
 
 ```sh
 npm install
 npm run build
-node lib/withoutDagJose.js
+node lib/with-go-ipfs.js
+node lib/with-js-ipfs.js
+node lib/with-ceramic-ipfs-daemon.js
 ```
