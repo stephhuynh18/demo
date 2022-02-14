@@ -1,23 +1,27 @@
 
 import { create as createIpfsClient } from 'ipfs-http-client'
-import { create as createCore } from 'ipfs-core'
+import { create as createCore } from 'old-ipfs-core'
 import getPort from 'get-port'
-import { HttpApi } from 'ipfs-http-server'
+import { HttpApi } from 'old-ipfs-http-server'
+import tmp from 'tmp-promise'
+
 
 
 async function main() {
-  const swarmPort = await getPort()
+  const tmpFolder = await tmp.dir({ unsafeCleanup: true })
+  await example(tmpFolder.path).finally(async () => {
+    await tmpFolder.cleanup()
+  })
+
+}
+async function example(repoPath: string) {
   const apiPort = await getPort()
-  const gatewayPort = await getPort()
-
-
   const ipfsCore = await createCore(
     {
       start: true,
+      repo: `${repoPath}/ipfs${apiPort}/`,
       config: {
         Addresses: {
-          Swarm: [`/ip4/127.0.0.1/tcp/${swarmPort}`],
-          Gateway: `/ip4/127.0.0.1/tcp/${gatewayPort}`,
           API: `/ip4/127.0.0.1/tcp/${apiPort}`,
         },
         Bootstrap: [],
@@ -45,6 +49,6 @@ main()
     process.exit(0)
   })
   .catch((err) => {
-    console.log('🚀 ~ file: stuff.js ~ line 57 ~ main ~ err', err)
+    console.log("🚀 ~ file: with-js-ipfs.ts ~ line 43 ~ err", err)
     process.exit(1)
   })
