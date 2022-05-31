@@ -10,10 +10,18 @@ const main = async () => {
   };
   const modelB: Partial<TestModel> = {
     message: 'world',
+    updatedAt: new Date('2022-05-31T05:00:00.000Z'),
+  };
+  const modelC: Partial<TestModel> = {
+    message: 'bonjour',
     updatedAt: new Date('2022-05-31T10:00:00.000Z'),
   };
+  const modelD: Partial<TestModel> = {
+    message: 'le monde',
+    updatedAt: new Date('2022-05-31T15:00:00.000Z'),
+  };
 
-  const values = [modelA, modelB];
+  const values = [modelA, modelB, modelC, modelD];
 
   console.log('VALUES BEFORE INSERT', values);
 
