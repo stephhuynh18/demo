@@ -2,44 +2,65 @@
 
 Uses Node v16.13.1
 
-This repo demonstrates two scenarios. A ipfs-http-client (latest) where the ipfs instance is:
-1. Ipfs-core + ipfs-http-server (latest)
-2. ipfs-core (v0.12.2) + ipfs-http-server(v0.9.2)
+This repo demonstrates the unexpected mutation of an array when it is passed into an insertQueryBuilder to be inserted into a sqlite db.
+In this scenario I created an array of 2 objects to be inserted. Each object consist of a message and a date. After the insert, the original array has been mutated. The objects now have their `updatedAt` dates switched. Note this does not happen every single time, so you may need a few runs to get this result.
 
-Scenario 1 works
-
-Scanario 2 fails with the following error
-
-```
-HTTPError: Failed to parse the JSON: SyntaxError: Unexpected token � in JSON at position 0
-    at Object.errorHandler [as handleError] (---/codepad/node_modules/ipfs-http-client/esm/src/lib/core.js:75:15)
-    at processTicksAndRejections (node:internal/process/task_queues:96:5)
-    at async Client.fetch (---/codepad/node_modules/ipfs-http-client/node_modules/ipfs-utils/src/http.js:144:9)
-    at async Object.put (---/codepad/node_modules/ipfs-http-client/esm/src/dag/put.js:27:19)
-    at async example (---/codepad/lib/with-old-ipfs-core.js:31:17)
-    at async main (---/codepad/lib/with-old-ipfs-core.js:8:5) {
-  response: Response {
-    size: 0,
-    timeout: 0,
-    [Symbol(Body internals)]: { body: [PassThrough], disturbed: true, error: null },
-    [Symbol(Response internals)]: {
-      url: 'http://127.0.0.1:52846/api/v0/dag/put?store-codec=dag-cbor&input-codec=dag-cbor&hash=sha2-256',
-      status: 400,
-      statusText: 'Bad Request',
-      headers: [Headers],
-      counter: 0
-    }
+```js
+VALUES BEFORE INSERT [
+  { message: 'hello', updatedAt: 2022-05-31T00:00:00.000Z }, // HELLO + T00:00
+  { message: 'world', updatedAt: 2022-05-31T10:00:00.000Z }  // WORLD + T10:00
+]
+VALUES AFTER INSERT [
+  // HELLO + T10:00
+  {
+    message: 'hello',
+    updatedAt: 2022-05-31T10:00:00.000Z,
+    id: '124b8afa-e7ea-4371-a672-2aa7c5969de4'
+  },
+  // WORLD + T00:00
+  {
+    message: 'world',
+    updatedAt: 2022-05-31T00:00:00.000Z,
+    id: '7ee13ae7-f6c9-46d7-b7f4-1c35da62e7d0'
   }
+]
+INSERT RESULTS InsertResult {
+  identifiers: [
+    { id: '124b8afa-e7ea-4371-a672-2aa7c5969de4' },
+    { id: '7ee13ae7-f6c9-46d7-b7f4-1c35da62e7d0' }
+  ],
+  generatedMaps: [
+    {
+      id: '124b8afa-e7ea-4371-a672-2aa7c5969de4',
+      updatedAt: 2022-05-31T10:00:00.000Z
+    },
+    {
+      id: '7ee13ae7-f6c9-46d7-b7f4-1c35da62e7d0',
+      updatedAt: 2022-05-31T00:00:00.000Z
+    }
+  ],
+  raw: 2
 }
+VALUES RETRIEVED FROM DB [
+  // HELLO + T00:00
+  TestModel {
+    id: '7ee13ae7-f6c9-46d7-b7f4-1c35da62e7d0',
+    message: 'hello',
+    updatedAt: 2022-05-31T00:00:00.000Z
+  },
+  // WORLD + T10:00
+  TestModel {
+    id: '124b8afa-e7ea-4371-a672-2aa7c5969de4',
+    message: 'world',
+    updatedAt: 2022-05-31T10:00:00.000Z
+  }
+]
 ```
-
-Should `ipfs-http-client` be compatible with older version of `ipfs-core`?
 
 ## How to Run
 
 ```sh
 npm install
 npm run build
-node lib/with-old-ipfs-core.js
-node lib/with-latest-ipfs-core.js
+node lib/problem.js
 ```
